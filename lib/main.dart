@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+
 
 void main() {
   runApp(MaterialApp(
@@ -17,6 +19,26 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   int hungerLevel = 50;
 
   final TextEditingController _nameController = TextEditingController();
+
+  Timer? _hungerTimer;
+
+  // Every 2 second increase hunger and decreases happiness
+  @override
+  void initState() {
+    super.initState();
+
+    _hungerTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      _updateHunger(); 
+    });
+  }
+
+  //For controller
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _hungerTimer?.cancel();
+    super.dispose();
+  }
 
 
   void _playWithPet() {
@@ -78,13 +100,6 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     } else {
       return "Unhappy 😢";
     }
-  }
-
-  //For controller
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
   }
 
   @override
