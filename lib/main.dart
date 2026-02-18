@@ -46,10 +46,20 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
 
   void _playWithPet() {
     setState(() {
-      happinessLevel += 10;
-      _updateHunger();
-      _checkGameState();
-      _updateEnergy(energy: -15);
+      if (energyLevel>=15) {
+        happinessLevel += 10;
+        _updateHunger();
+        _checkGameState();
+        _updateEnergy(energy: -15);
+      } else {
+        showDialog(
+                        context: context,
+                        builder: (context) => const AlertDialog(
+                          title: Text("Not enough Enegry"),
+                          content: Text("Feed your dog to restore energy"),
+                        ),
+                      );
+      }
     });
   }
 
