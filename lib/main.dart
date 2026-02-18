@@ -123,7 +123,34 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
             Text('Name: $petName', style: TextStyle(fontSize: 20.0)),
             SizedBox(height: 16.0),
 
+            // Name input
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Enter pet name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            SizedBox(height: 12),
+
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  if (_nameController.text.trim().isNotEmpty) {
+                    petName = _nameController.text.trim();
+                  }
+                });
+              },
+              child: Text('Set Name'),
+            ),
+
+            SizedBox(height: 20),
+
             
+
             Text('Happiness Level: $happinessLevel', style: TextStyle(fontSize: 20.0)),
             SizedBox(height: 16.0),
             Text('Hunger Level: $hungerLevel', style: TextStyle(fontSize: 20.0)),
