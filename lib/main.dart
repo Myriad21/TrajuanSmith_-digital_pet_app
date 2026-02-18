@@ -19,18 +19,18 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   int hungerLevel = 50;
   bool _gameOver = false;
   DateTime? _winStartTime;
-
+  int energyLevel = 100;
 
   final TextEditingController _nameController = TextEditingController();
 
   Timer? _hungerTimer;
 
-  // Every 2 second increase hunger and decreases happiness
+  // Every 30 second increase hunger and decreases happiness
   @override
   void initState() {
     super.initState();
 
-    _hungerTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    _hungerTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       _updateHunger(); 
     });
   }
@@ -49,6 +49,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       happinessLevel += 10;
       _updateHunger();
       _checkGameState();
+      _updateEnergy(energy: -15);
     });
   }
 
@@ -60,6 +61,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       }
       _updateHappiness();
       _checkGameState();
+      _updateEnergy(energy: 5);
     });
   }
 
@@ -88,6 +90,15 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       _checkGameState();
     });
   }
+
+  void _updateEnergy({required int energy}) {
+    setState(() {
+      energyLevel += energy;
+      if (energyLevel > 100) energyLevel = 100;
+      if (energyLevel < 0) energyLevel = 0;
+    });
+  }
+
 
   Color _moodColor(int happinessLevel) {
     if (happinessLevel > 70) {
@@ -217,11 +228,26 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
             SizedBox(height: 20),
 
             
-
             Text('Happiness Level: $happinessLevel', style: TextStyle(fontSize: 20.0)),
             SizedBox(height: 16.0),
+            
+            // Hunger level
             Text('Hunger Level: $hungerLevel', style: TextStyle(fontSize: 20.0)),
             SizedBox(height: 32.0),
+
+            // Energy Bar
+            SizedBox(height: 16.0),
+            Text('Energy Level: $energyLevel', style: TextStyle(fontSize: 20.0)),
+            SizedBox(height: 8.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: LinearProgressIndicator(
+                value: energyLevel / 100,
+                minHeight: 10,
+              ),
+            ),
+            SizedBox(height: 16.0),
+
             ElevatedButton(
               onPressed: _gameOver ? null : _playWithPet,
               child: Text('Play with Your Pet'),
