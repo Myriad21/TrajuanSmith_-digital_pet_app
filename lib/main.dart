@@ -17,6 +17,9 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   String petName = "Your Pet";
   int happinessLevel = 50;
   int hungerLevel = 50;
+  bool _gameOver = false;
+  DateTime? _winStartTime;
+
 
   final TextEditingController _nameController = TextEditingController();
 
@@ -45,6 +48,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     setState(() {
       happinessLevel += 10;
       _updateHunger();
+      _checkGameState();
     });
   }
 
@@ -55,6 +59,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
         hungerLevel = 0;
       }
       _updateHappiness();
+      _checkGameState();
     });
   }
 
@@ -67,6 +72,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     } else {
       happinessLevel += 10;
     }
+    _checkGameState();
   }
 
   void _updateHunger() {
@@ -79,6 +85,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       if (happinessLevel < 0){
         happinessLevel = 0;
       }
+      _checkGameState();
     });
   }
 
@@ -101,6 +108,51 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       return "Unhappy 😢";
     }
   }
+
+  void _checkGameState() {
+    if (_gameOver) return;
+
+    // LOSS condition
+    if (hungerLevel >= 100 && happinessLevel <= 10) {
+      _endGame("Game Over", "Your pet is too hungry and unhappy 😭");
+      return;
+    }
+
+    // WIN condition: happiness > 80 for 3 minutes
+    // reset streak if drops to 80 or below
+    if (happinessLevel > 80) {
+      _winStartTime ??= DateTime.now();
+      final elapsed = DateTime.now().difference(_winStartTime!);
+      if (elapsed >= const Duration(minutes: 3)) {
+        _endGame("You Win!", "Your pet stayed very happy for 3 minutes 🎉");
+      }
+    } else {
+      _winStartTime = null;
+    }
+  }
+
+  void _endGame(String title, String message) {
+    _gameOver = true;
+    _hungerTimer?.cancel();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -171,12 +223,12 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
             Text('Hunger Level: $hungerLevel', style: TextStyle(fontSize: 20.0)),
             SizedBox(height: 32.0),
             ElevatedButton(
-              onPressed: _playWithPet,
+              onPressed: _gameOver ? null : _playWithPet,
               child: Text('Play with Your Pet'),
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _feedPet,
+              onPressed: _gameOver ? null : _feedPet,
               child: Text('Feed Your Pet'),
             ),
           ],
